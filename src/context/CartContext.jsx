@@ -25,20 +25,21 @@ export function CartProvider({ children }) {
 
   const addToCart = (producto) => {
     setCart((prevCart) => {
-      const existe = prevCart.find((item) => item.id === producto.id || item._id === producto._id);
-      const idLlave = producto._id ? '_id' : 'id';
+      const productoId = producto._id || producto.id;
+      const existe = prevCart.find((item) => (item._id || item.id) === productoId);
 
       if (existe) {
         return prevCart.map((item) =>
-          item[idLlave] === producto[idLlave] ? { ...item, cantidad: item.cantidad + 1 } : item
+          (item._id || item.id) === productoId ? { ...item, cantidad: item.cantidad + 1 } : item
         );
       }
-      return [...prevCart, { ...producto, cantidad: 1 }];
+
+      return [...prevCart, { ...producto, id: productoId, cantidad: 1 }];
     });
   };
 
   const removeFromCart = (id) => {
-    setCart((prevCart) => prevCart.filter((item) => item.id !== id && item._id !== id));
+    setCart((prevCart) => prevCart.filter((item) => (item._id || item.id) !== id));
   };
 
   const clearCart = () => setCart([]);
@@ -60,6 +61,32 @@ export function CartProvider({ children }) {
 
       setProductos((prevProductos) => [...prevProductos, data.producto || data]);
       alert('¡Producto creado exitosamente en la base de datos!');
+      return true;
+    } catch (error) {
+      alert(error.message);
+      return false;
+    }
+  };
+
+  const editarProductoGlobal = async (id, datosProducto) => {
+    const token = localStorage.getItem('token_tienda');
+    try {
+      const res = await fetch(`${API_URL}/products/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(datosProducto)
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.mensaje || 'No se pudo editar el producto');
+
+      setProductos((prevProductos) =>
+        prevProductos.map((prod) => (prod._id === id || prod.id === id ? data.producto || data : prod))
+      );
+      alert('Producto actualizado correctamente.');
       return true;
     } catch (error) {
       alert(error.message);
@@ -119,6 +146,7 @@ export function CartProvider({ children }) {
       clearCart,
       productos,
       agregarProductoGlobal,
+      editarProductoGlobal,
       eliminarProductoGlobal,
       crearPedido
     }}>

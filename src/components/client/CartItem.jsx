@@ -20,7 +20,7 @@ export default function CartItem({ item, onEliminar }) {
           Cant: <strong className="text-white">{item.cantidad}</strong>
         </span>
         <button 
-          onClick={() => onEliminar(item.id)} 
+          onClick={() => onEliminar(item._id || item.id)} 
           className="text-sm text-red-400 hover:text-red-300 font-medium cursor-pointer transition-colors"
         >
           Eliminar

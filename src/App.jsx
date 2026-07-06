@@ -17,13 +17,13 @@ function NavbarYContenido() {
   return (
     <Router>
       <nav className="border-b border-amber-900/70 bg-[#1d120c]/95 px-6 py-4 shadow-lg shadow-black/20 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between">
+        <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3">
           <Link to="/" className="flex items-center gap-2 text-lg font-semibold tracking-tight text-amber-100">
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-700 text-sm font-bold text-white">☕</span>
             Aroma Café
           </Link>
 
-          <div className="flex items-center gap-4 text-sm text-amber-200">
+          <div className="flex flex-wrap items-center justify-end gap-3 text-sm text-amber-200">
             <Link to="/" className="transition hover:text-amber-300">Inicio</Link>
             <Link to="/tienda" className="transition hover:text-amber-300">Tienda</Link>
             <Link to="/carrito" className="transition hover:text-amber-300">Carrito</Link>
@@ -39,7 +39,7 @@ function NavbarYContenido() {
                 <Link to="/registro" className="rounded-full bg-amber-700 px-3 py-1.5 text-white transition hover:bg-amber-600">Registro</Link>
               </>
             ) : (
-              <div className="flex items-center gap-3 border-l border-amber-800 pl-3">
+              <div className="flex flex-wrap items-center gap-3 border-l border-amber-800 pl-3">
                 <span className="rounded-full bg-amber-900/80 px-2.5 py-1 text-xs font-medium text-amber-100">{user.nombre}</span>
                 <button
                   type="button"

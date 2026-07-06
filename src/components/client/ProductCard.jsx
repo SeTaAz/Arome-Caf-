@@ -6,7 +6,7 @@ export default function ProductCard({ producto, onAgregar }) {
   });
 
   return (
-    <div className="flex w-full max-w-full flex-col justify-between overflow-hidden rounded-2xl border border-amber-900/60 bg-[#24180f] shadow-lg shadow-black/20 transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+    <div className="flex w-full max-w-full cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border border-amber-900/60 bg-[#24180f] shadow-lg shadow-black/20 transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
       <div className="relative h-48 w-full overflow-hidden bg-amber-950/60">
         <img
           src={producto.imagen}
@@ -29,7 +29,7 @@ export default function ProductCard({ producto, onAgregar }) {
 
           <button
             onClick={() => onAgregar(producto)}
-            className="w-full rounded-xl bg-amber-800 px-3 py-2.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-amber-900"
+            className="w-full cursor-pointer rounded-xl bg-amber-800 px-3 py-2.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-amber-900"
           >
             Agregar al carrito
           </button>

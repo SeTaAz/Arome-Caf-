@@ -183,6 +183,29 @@ app.get('/api/users', verificarToken, async (req, res) => {
   }
 });
 
+app.delete('/api/users/:id', verificarToken, async (req, res) => {
+  if (req.usuario.rol !== 'admin') return res.status(403).json({ mensaje: 'No autorizado.' });
+
+  try {
+    const usuario = await User.findById(req.params.id);
+    if (!usuario) return res.status(404).json({ mensaje: 'Usuario no encontrado.' });
+
+    if (usuario.rol === 'admin') {
+      return res.status(400).json({ mensaje: 'No se puede eliminar a un administrador.' });
+    }
+
+    const pedidosAsociados = await mongoose.model('Order').findOne({ usuario: req.params.id });
+    if (pedidosAsociados) {
+      return res.status(400).json({ mensaje: 'No se puede eliminar un usuario con pedidos asociados.' });
+    }
+
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ mensaje: 'Usuario eliminado correctamente.' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.get('/api/products', async (req, res) => {
   try {
     const productos = await Product.find();
@@ -199,6 +222,39 @@ app.post('/api/products', verificarToken, async (req, res) => {
     const nuevoProducto = new Product({ nombre, precio, descripcion, imagen });
     await nuevoProducto.save();
     res.status(201).json({ producto: nuevoProducto });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/products/:id', verificarToken, async (req, res) => {
+  if (req.usuario.rol !== 'admin') return res.status(403).json({ mensaje: 'No autorizado.' });
+
+  try {
+    const { nombre, precio, descripcion, imagen } = req.body;
+    const productoActualizado = await Product.findByIdAndUpdate(
+      req.params.id,
+      { nombre, precio, descripcion, imagen },
+      { new: true }
+    );
+
+    if (!productoActualizado) return res.status(404).json({ mensaje: 'Producto no encontrado.' });
+
+    res.json({ mensaje: 'Producto actualizado correctamente.', producto: productoActualizado });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/orders/:id', verificarToken, async (req, res) => {
+  if (req.usuario.rol !== 'admin') return res.status(403).json({ mensaje: 'No autorizado.' });
+
+  try {
+    const pedido = await Order.findById(req.params.id);
+    if (!pedido) return res.status(404).json({ mensaje: 'Pedido no encontrado.' });
+
+    await Order.findByIdAndDelete(req.params.id);
+    res.json({ mensaje: 'Pedido eliminado correctamente.' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -248,6 +304,28 @@ app.get('/api/orders', verificarToken, async (req, res) => {
   try {
     const pedidos = await Order.find().populate('usuario', 'name email telefono direccion').sort({ createdAt: -1 });
     res.json(pedidos);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.patch('/api/orders/:id/cancel', verificarToken, async (req, res) => {
+  try {
+    const pedido = await Order.findById(req.params.id);
+    if (!pedido) return res.status(404).json({ mensaje: 'Pedido no encontrado.' });
+
+    if (pedido.usuario.toString() !== req.usuario.id && req.usuario.rol !== 'admin') {
+      return res.status(403).json({ mensaje: 'No autorizado.' });
+    }
+
+    if (pedido.estado !== 'Pendiente') {
+      return res.status(400).json({ mensaje: 'Solo puedes cancelar pedidos pendientes.' });
+    }
+
+    pedido.estado = 'Cancelado';
+    await pedido.save();
+
+    res.json({ mensaje: 'Pedido cancelado correctamente.', pedido });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
