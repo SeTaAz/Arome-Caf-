@@ -56,21 +56,17 @@ function NavbarYContenido() {
 
       <main className="min-h-screen bg-transparent p-6 text-amber-50">
         <Routes>
+          {/* 🔓 RUTAS PÚBLICAS: Accesibles para cualquier visitante */}
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/registro" element={<RegisterPage />} />
           <Route path="/carrito" element={<CartPage />} />
           <Route path="/mis-pedidos" element={<OrdersPage />} />
+          
+          {/* Tienda liberada: ya no requiere iniciar sesión */}
+          <Route path="/tienda" element={<ShopPage />} />
 
-          <Route
-            path="/tienda"
-            element={
-              <ProtectedRoute allowedRoles={['admin', 'cliente']}>
-                <ShopPage />
-              </ProtectedRoute>
-            }
-          />
-
+          {/* 🔒 RUTAS PROTEGIDAS: Solo para el rol Administrador */}
           <Route
             path="/admin"
             element={
@@ -80,6 +76,7 @@ function NavbarYContenido() {
             }
           />
 
+          {/* Ruta para manejar errores 404 */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>
